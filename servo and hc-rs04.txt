@@ -1,0 +1,39 @@
+#include <Servo.h>
+
+Servo myservo;  // Create a servo object
+int servoPin = 9;  // Servo control pin
+int trigPin = 10;  // HC-SR04 trigger pin
+int echoPin = 11;  // HC-SR04 echo pin
+long duration;
+int distance;
+
+void setup() {
+  Serial.begin(9600);
+  myservo.attach(servoPin);  // Attach the servo to the servoPin
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+}
+
+void loop() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2;
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  if (distance < 10) {
+    myservo.write(90);  // Rotate the servo to 90 degrees
+    delay(500);  // Wait for the servo to reach the position
+  } else {
+    myservo.write(0);  // Rotate the servo back to 0 degrees
+  }
+
+  delay(100);  // Wait before taking the next measurement
+}

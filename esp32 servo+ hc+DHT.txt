@@ -1,0 +1,72 @@
+#include <DHT.h>
+#include <Wire.h>
+#include <ESP32Servo.h>
+// Define the type of DHT sensor and the pin it's connected to
+#define DHTPIN 15       // Digital pin connected to the DHT sensor
+#define DHTTYPE DHT22  // DHT 22
+
+#define echoPin 4               // CHANGE PIN NUMBER HERE IF YOU WANT TO USE A DIFFERENT PIN
+#define trigPin 2               // CHANGE PIN NUMBER HERE IF YOU WANT TO USE A DIFFERENT PIN
+long duration, distance;
+Servo myservo;  // Create a servo object
+int servoPin = 18;
+// Initialize DHT sensor
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  myservo.attach(servoPin);  // Attach the servo to the servoPin
+}
+
+void loop() {
+  // Wait a few seconds between measurements
+  delay(2000);
+
+  // Read humidity
+  float humidity = dht.readHumidity();
+  // Read temperature in Celsius
+  float temperatureC = dht.readTemperature();
+  // Read temperature in Fahrenheit
+  float temperatureF = dht.readTemperature(true);
+
+  // Check if any reads failed
+  if (isnan(humidity) || isnan(temperatureC) || isnan(temperatureF)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  // Print data to serial monitor
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.print("%\t");
+  Serial.print("Temperature: ");
+  Serial.print(temperatureC);
+  Serial.print("°C\t");
+  Serial.print(temperatureF);
+  Serial.println("°F");
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration / 58.2;
+  String disp = String(distance);
+
+  Serial.print("Distance: ");
+  Serial.print(disp);
+  Serial.println(" cm");
+  // If distance is less than 5 cm, rotate the servo motor by 90 degrees
+  if (distance < 5) {
+    myservo.write(90);  // Rotate the servo to 90 degrees
+    delay(500);  // Wait for the servo to reach the position
+  } else {
+    myservo.write(0);  // Rotate the servo back to 0 degrees
+  }
+  delay(500);
+
+}

@@ -1,0 +1,45 @@
+// Pin definitions
+const int ledPin = 2;   // Built-in LED pin
+const int servoPin = 12; // Pin to which the servo signal wire is connected
+
+// Variables to control servo position
+int servoAngle = 0;      // Initial position of the servo motor
+
+void setup() {
+  pinMode(ledPin, OUTPUT);     // Initialize the built-in LED pin as an output
+  pinMode(servoPin, OUTPUT);   // Initialize the servo pin as an output
+}
+
+void loop() {
+  // Turn the built-in LED on
+  digitalWrite(ledPin, HIGH);
+
+  // Move the servo to 90 degrees
+  moveServo(90);
+
+  // Wait for 1 second
+  delay(1000);
+
+  // Turn the built-in LED off
+  digitalWrite(ledPin, LOW);
+
+  // Move the servo to 0 degrees
+  moveServo(0);
+
+  // Wait for 1 second
+  delay(1000);
+}
+
+// Function to move the servo motor to a specified angle
+void moveServo(int angle) {
+  // Map the angle to the corresponding pulse width (500 to 2400 microseconds)
+  int pulseWidth = map(angle, 0, 180, 500, 2400);
+  
+  // Generate the PWM signal for the servo motor
+  digitalWrite(servoPin, HIGH);
+  delayMicroseconds(pulseWidth);
+  digitalWrite(servoPin, LOW);
+
+  // Update the current servo position
+  servoAngle = angle;
+}
